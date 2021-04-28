@@ -16,14 +16,21 @@ public class SymbolTable {
         table.push(scope);
     }
 
-    public void exit(){
-        table.pop();
+    public void enter(Map<String, Symbol> parentScope){
+        Map<String, Symbol> scope = new HashMap<String, Symbol>();
+        scope.putAll(parentScope);
+        table.push(scope);
+        
+    }
+
+    public Map<String, Symbol> exit(){
+        return table.pop();
     }
 
     public void insert(String name, Symbol symbol) throws Exception {
         Map<String, Symbol> scope = table.peek();
         if(scope.containsKey(name)){
-            throw new Exception(); // TODO Fix message.
+            throw new Exception("Duplicate use of name " + name); // TODO Fix message.
         }
         scope.put(name, symbol);
     }

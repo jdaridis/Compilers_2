@@ -1,4 +1,22 @@
-import syntaxtree.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import syntaxtree.ArrayAssignmentStatement;
+import syntaxtree.ArrayType;
+import syntaxtree.AssignmentStatement;
+import syntaxtree.BooleanType;
+import syntaxtree.ClassDeclaration;
+import syntaxtree.ClassExtendsDeclaration;
+import syntaxtree.FormalParameter;
+import syntaxtree.FormalParameterList;
+import syntaxtree.FormalParameterTail;
+import syntaxtree.Goal;
+import syntaxtree.Identifier;
+import syntaxtree.IntegerType;
+import syntaxtree.MainClass;
+import syntaxtree.MethodDeclaration;
+import syntaxtree.PrimaryExpression;
+import syntaxtree.VarDeclaration;
 import visitor.GJDepthFirst;
 
 public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
@@ -94,6 +112,43 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
     /**
      * Grammar production:
+     * f0 -> Identifier()
+     * f1 -> "["
+     * f2 -> Expression()
+     * f3 -> "]"
+     * f4 -> "="
+     * f5 -> Expression()
+     * f6 -> ";"
+     */
+
+    @Override
+    public String visit(ArrayAssignmentStatement n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        String name = n.f0.accept(this, argu);
+
+        if(argu.lookup(name) == null){
+            throw new Exception("Next time, do us the favor and declare the variable " + name);
+        }
+        return super.visit(n, argu);
+    }
+
+    
+
+    @Override
+    public String visit(PrimaryExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        String name = super.visit(n, argu);
+
+        if(name != null){
+            if(argu.lookup(name) == null){
+                throw new Exception("Next time, do us the favor and declare the variable " + name);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Grammar production:
      * f0 -> "class"
      * f1 -> Identifier()
      * f2 -> "{"
@@ -106,15 +161,98 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     public String visit(ClassDeclaration n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
         String name = n.f1.accept(this, argu);
-        argu.insert(name, new ClassSymbol(name, name));
+        ClassSymbol symbol = new ClassSymbol(name, name);
+        Map<String, Symbol> fields;
+        Map<String, Symbol> methods;
+        argu.insert(name, symbol);
 
         argu.enter();
-        super.visit(n, argu);
 
+        n.f3.accept(this, argu);
 
-        argu.exit();
+        argu.enter();
+
+        n.f4.accept(this, argu);
+
+        methods = argu.exit();
+        fields = argu.exit();
+        symbol.fields.putAll(fields);
+        symbol.methods.putAll(methods);
+        
         return null;
 
+    }
+
+    private void parentEnterHelper(ClassSymbol parent, SymbolTable table){
+        if(parent.parentClass == null){
+            table.enter(parent.fields);
+            table.enter(parent.methods);
+        } else {
+            parentEnterHelper(parent.parentClass, table);
+            table.enter(parent.fields);
+            table.enter(parent.methods);
+        }
+    }
+
+    private void parentExitHelper(ClassSymbol parent, SymbolTable table){
+        if(parent.parentClass == null){
+            table.exit();
+            table.exit();
+        } else {
+            parentExitHelper(parent.parentClass, table);
+            table.exit();
+            table.exit();
+        }
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> "class"
+     * f1 -> Identifier()
+     * f2 -> "extends"
+     * f3 -> Identifier()
+     * f4 -> "{"
+     * f5 -> ( VarDeclaration() )*
+     * f6 -> ( MethodDeclaration() )*
+     * f7 -> "}"
+     */
+
+    @Override
+    public String visit(ClassExtendsDeclaration n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        String className = n.f1.accept(this, argu);
+        String parentName = n.f3.accept(this, argu);
+        Map<String, Symbol> fields;
+        Map<String, Symbol> methods;
+
+        ClassSymbol parent = (ClassSymbol) argu.lookup(parentName);
+        ClassSymbol symbol = new ClassSymbol(className, className, parent);
+
+        argu.insert(className, symbol);
+        
+        if(parent != null){
+            parentEnterHelper(parent, argu);
+        }
+        // argu.print();
+
+
+        argu.enter();
+
+        n.f5.accept(this, argu);
+
+        argu.enter();
+
+        n.f6.accept(this, argu);
+        
+        // argu.print();
+        methods = argu.exit();
+        fields = argu.exit();
+        symbol.fields.putAll(fields);
+        symbol.methods.putAll(methods);
+        
+        parentExitHelper(parent, argu);
+        
+        return null;
     }
 
         /**
@@ -142,13 +280,29 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         argu.enter();
         super.visit(n, argu);
-        argu.print();
+        // argu.print();
         
         argu.exit();
 
         return null;
     }
 
+    
+
+
+    @Override
+    public String visit(FormalParameterList n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return super.visit(n, argu);
+    }
+
+    
+
+    @Override
+    public String visit(FormalParameterTail n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return super.visit(n, argu);
+    }
 
     /**
      * Grammar production:
@@ -164,7 +318,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         argu.insert(name, new Symbol(name, type));
 
-        return super.visit(n, argu);
+        return null;
     }
 
 

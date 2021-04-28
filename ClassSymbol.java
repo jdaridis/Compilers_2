@@ -5,21 +5,32 @@ public class ClassSymbol extends Symbol {
     String className;
     ClassSymbol parentClass;
 
-    Map<String,Symbol> members;
+    Map<String,Symbol> fields;
+    Map<String, Symbol> methods;
 
     public ClassSymbol(String id, String className) {
         super(id, PrimitiveType.IDENTIFIER);
         this.className = className;
-        members = new HashMap<String, Symbol>();
+        fields = new HashMap<String, Symbol>();
+        methods = new HashMap<String, Symbol>();
     }
 
     public ClassSymbol(String id, String className, ClassSymbol parentClass) {
         super(id, PrimitiveType.IDENTIFIER);
         this.className = className;
         this.parentClass = parentClass;
-        members = new HashMap<String, Symbol>();
+        fields = new HashMap<String, Symbol>();
+        methods = new HashMap<String, Symbol>();
 
     }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return className + " " + id + " " + fields.toString() + " " + methods.toString();
+    }
+
+    
 
     
 }
