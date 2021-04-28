@@ -54,5 +54,12 @@ public class FunctionSymbol extends Symbol {
         }
     }
 
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return returnType.typeName + " " + id + "()";
+    }
+
     
 }
