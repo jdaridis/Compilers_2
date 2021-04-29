@@ -56,12 +56,11 @@ public class SymbolTable {
         return null;
     }
 
-    public ClassSymbol lookupType(String name){
-        boolean found = false;
+    public ClassDeclSymbol lookupType(String name){
         if(table.size() > 0){
             Map<String, Symbol> scope = table.getLast();
             if(scope.containsKey(name)){
-                return (ClassSymbol)scope.get(name);
+                return (ClassDeclSymbol)scope.get(name);
             } else {
                 return null;
             }

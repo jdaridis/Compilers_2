@@ -58,7 +58,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     public String visit(MainClass n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
         String name = n.f1.accept(this, argu);
-        argu.insert(name, new ClassSymbol(name, name));
+        argu.insert(name, new ClassDeclSymbol(name));
 
         argu.enter();
         super.visit(n, argu);
@@ -191,7 +191,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     public String visit(ClassDeclaration n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
         String name = n.f1.accept(this, argu);
-        ClassSymbol symbol = new ClassSymbol(name, name);
+        ClassDeclSymbol symbol = new ClassDeclSymbol(name);
         Map<String, Symbol> fields;
         Map<String, Symbol> methods;
         argu.insert(name, symbol);
@@ -213,7 +213,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
     }
 
-    private void parentEnterHelper(ClassSymbol parent, SymbolTable table){
+    private void parentEnterHelper(ClassDeclSymbol parent, SymbolTable table){
         if(parent.parentClass == null){
             table.enter(parent.fields);
             table.enter(parent.methods);
@@ -224,7 +224,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         }
     }
 
-    private void parentExitHelper(ClassSymbol parent, SymbolTable table){
+    private void parentExitHelper(ClassDeclSymbol parent, SymbolTable table){
         if(parent.parentClass == null){
             table.exit();
             table.exit();
@@ -250,13 +250,13 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     @Override
     public String visit(ClassExtendsDeclaration n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        String className = n.f1.accept(this, argu);
+        String className = n.f1.accept(this, argu); 
         String parentName = n.f3.accept(this, argu);
         Map<String, Symbol> fields;
         Map<String, Symbol> methods;
 
-        ClassSymbol parent = (ClassSymbol) argu.lookup(parentName);
-        ClassSymbol symbol = new ClassSymbol(className, className, parent);
+        ClassDeclSymbol parent = (ClassDeclSymbol) argu.lookup(parentName);
+        ClassDeclSymbol symbol = new ClassDeclSymbol(className, parent);
 
         argu.insert(className, symbol);
         

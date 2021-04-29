@@ -6,42 +6,44 @@ import syntaxtree.Goal;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        if(args.length != 1){
+        if(args.length < 1){
             System.err.println("Usage: java Main <inputFile>");
             System.exit(1);
         }
 
-
-
-        FileInputStream fis = null;
-        try{
-            fis = new FileInputStream(args[0]);
-            MiniJavaParser parser = new MiniJavaParser(fis);
-
-            Goal root = parser.Goal();
-
-            System.err.println("Program parsed successfully.");
-
-            DeclarationsVisitor declarations = new DeclarationsVisitor();
-            SymbolTable symbolTable = new SymbolTable();
-
-            root.accept(declarations, symbolTable);
-            symbolTable.print();
-        }
-        catch(ParseException ex){
-            System.out.println(ex.getMessage());
-        }
-        catch(FileNotFoundException ex){
-            System.err.println(ex.getMessage());
-        }
-        finally{
+        for(int i = 0; i < args.length;i++){
+            FileInputStream fis = null;
             try{
-                if(fis != null) fis.close();
+                fis = new FileInputStream(args[i]);
+                MiniJavaParser parser = new MiniJavaParser(fis);
+
+                Goal root = parser.Goal();
+
+                System.err.println("Program parsed successfully.");
+
+                DeclarationsVisitor declarations = new DeclarationsVisitor();
+                SymbolTable symbolTable = new SymbolTable();
+
+                root.accept(declarations, symbolTable);
+                symbolTable.print();
             }
-            catch(IOException ex){
+            catch(ParseException ex){
+                System.out.println(ex.getMessage());
+            }
+            catch(FileNotFoundException ex){
                 System.err.println(ex.getMessage());
             }
+            finally{
+                try{
+                    if(fis != null) fis.close();
+                }
+                catch(IOException ex){
+                    System.err.println(ex.getMessage());
+                }
+            }
         }
+
+        
     }
 
 }
