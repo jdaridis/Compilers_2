@@ -3,6 +3,7 @@
 *.jj
 /syntaxtree
 /visitor
+/tests
 JavaCharStream.java
 MiniJavaParser.java
 MiniJavaParserConstants.java

@@ -26,7 +26,7 @@ public class Main {
             SymbolTable symbolTable = new SymbolTable();
 
             root.accept(declarations, symbolTable);
-
+            symbolTable.print();
         }
         catch(ParseException ex){
             System.out.println(ex.getMessage());

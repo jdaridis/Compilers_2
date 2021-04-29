@@ -1,4 +1,3 @@
-import java.util.HashMap;
 import java.util.Map;
 
 import syntaxtree.ArrayAssignmentStatement;
@@ -8,8 +7,6 @@ import syntaxtree.BooleanType;
 import syntaxtree.ClassDeclaration;
 import syntaxtree.ClassExtendsDeclaration;
 import syntaxtree.FormalParameter;
-import syntaxtree.FormalParameterList;
-import syntaxtree.FormalParameterTail;
 import syntaxtree.Goal;
 import syntaxtree.Identifier;
 import syntaxtree.IntegerType;
@@ -80,11 +77,34 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     @Override
     public String visit(VarDeclaration n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        String type = n.f0.accept(this, argu);
+        String strType = n.f0.accept(this, argu);
 
         String name = n.f1.accept(this, argu);
 
-        argu.insert(name, new Symbol(name, type));
+        PrimitiveType type;
+
+        switch(strType){
+            case "int":
+                type = PrimitiveType.INT;
+                break;
+            case "boolean":
+                type = PrimitiveType.BOOLEAN;
+                break;
+            case "int[]":
+                type = PrimitiveType.ARRAY;
+                break;
+            default:
+                type = PrimitiveType.IDENTIFIER;
+                break;
+        }
+        Symbol symbol;
+
+        if(type != PrimitiveType.IDENTIFIER){
+            symbol = new Symbol(name, type);
+        } else {
+            symbol = new ClassSymbol(name, strType);
+        }
+        argu.insert(name, symbol);
         
 
         return null;
@@ -132,7 +152,17 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         return super.visit(n, argu);
     }
 
-    
+    /**
+     * Grammar production:
+     * f0 -> IntegerLiteral()
+     *       | TrueLiteral()
+     *       | FalseLiteral()
+     *       | Identifier()
+     *       | ThisExpression()
+     *       | ArrayAllocationExpression()
+     *       | AllocationExpression()
+     *       | BracketExpression()
+     */
 
     @Override
     public String visit(PrimaryExpression n, SymbolTable argu) throws Exception {
@@ -276,33 +306,29 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     public String visit(MethodDeclaration n, SymbolTable argu) throws Exception {
         String type = n.f1.accept(this, argu);
         String methodName = n.f2.accept(this, argu);
-        argu.insert(methodName, new FunctionSymbol(methodName, type));
+        FunctionSymbol method = new FunctionSymbol(methodName, type);
+        Map<String, Symbol> args;
+        argu.insert(methodName, method);
 
         argu.enter();
-        super.visit(n, argu);
+        n.f4.accept(this, argu);
+
+        args = argu.peek();
+        method.args.putAll(args);
+        n.f7.accept(this, argu);
+        n.f8.accept(this, argu);
+        
+
+        n.f10.accept(this, argu);
+
         // argu.print();
         
         argu.exit();
+        System.out.println("Args " + method.args.values());
 
         return null;
     }
 
-    
-
-
-    @Override
-    public String visit(FormalParameterList n, SymbolTable argu) throws Exception {
-        // TODO Auto-generated method stub
-        return super.visit(n, argu);
-    }
-
-    
-
-    @Override
-    public String visit(FormalParameterTail n, SymbolTable argu) throws Exception {
-        // TODO Auto-generated method stub
-        return super.visit(n, argu);
-    }
 
     /**
      * Grammar production:
@@ -312,11 +338,36 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     @Override
     public String visit(FormalParameter n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        String type = n.f0.accept(this, argu);
+        // System.out.println("Parameter");
+        String strType = n.f0.accept(this, argu);
 
         String name = n.f1.accept(this, argu);
 
-        argu.insert(name, new Symbol(name, type));
+        PrimitiveType type;
+
+        switch(strType){
+            case "int":
+                type = PrimitiveType.INT;
+                break;
+            case "boolean":
+                type = PrimitiveType.BOOLEAN;
+                break;
+            case "int[]":
+                type = PrimitiveType.ARRAY;
+                break;
+            default:
+                type = PrimitiveType.IDENTIFIER;
+                break;
+        }
+        Symbol symbol;
+
+        if(type != PrimitiveType.IDENTIFIER){
+            symbol = new Symbol(name, type);
+        } else {
+            symbol = new ClassSymbol(name, strType);
+        }
+        argu.insert(name, symbol);
+        
 
         return null;
     }

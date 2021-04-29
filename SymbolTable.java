@@ -27,6 +27,10 @@ public class SymbolTable {
         return table.pop();
     }
 
+    public Map<String, Symbol> peek(){
+        return table.peek();
+    }
+
     public void insert(String name, Symbol symbol) throws Exception {
         Map<String, Symbol> scope = table.peek();
         if(scope.containsKey(name)){
@@ -50,6 +54,20 @@ public class SymbolTable {
             return null;
         }
         return null;
+    }
+
+    public ClassSymbol lookupType(String name){
+        boolean found = false;
+        if(table.size() > 0){
+            Map<String, Symbol> scope = table.getLast();
+            if(scope.containsKey(name)){
+                return (ClassSymbol)scope.get(name);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     public void print(){

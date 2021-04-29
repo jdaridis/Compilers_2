@@ -27,7 +27,13 @@ public class ClassSymbol extends Symbol {
     @Override
     public String toString() {
         // TODO Auto-generated method stub
-        return className + " " + id + " " + fields.toString() + " " + methods.toString();
+        String ret;
+        if(parentClass != null){
+            ret = className + ":" + parentClass.className + " " + id + " " + fields.toString() + " " + methods.toString();
+        } else {
+            ret = className + " " + id + " " + fields.toString() + " " + methods.toString();
+        }
+        return ret;
     }
 
     
