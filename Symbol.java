@@ -15,6 +15,25 @@ enum PrimitiveType {
         this.size = size;
     }
 
+    public static PrimitiveType strToPrimitiveType(String strType){
+        PrimitiveType type;
+        switch(strType){
+            case "int":
+                type = INT;
+                break;
+            case "boolean":
+                type = BOOLEAN;
+                break;
+            case "int[]":
+                type = ARRAY;
+                break;
+            default:
+                type = IDENTIFIER;
+                break;
+        }
+        return type;
+    }
+
 }
 
 public class Symbol {
@@ -27,21 +46,9 @@ public class Symbol {
 
     public Symbol(String id, String strType) {
         this.id = id;
-        switch(strType){
-            case "int":
-                type = PrimitiveType.INT;
-                break;
-            case "boolean":
-                type = PrimitiveType.BOOLEAN;
-                break;
-            case "int[]":
-                type = PrimitiveType.ARRAY;
-                break;
-            default:
-                type = PrimitiveType.IDENTIFIER;
-                break;
-        }
+        type = PrimitiveType.strToPrimitiveType(strType);
     }
+
 
     @Override
     public String toString() {

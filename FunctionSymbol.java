@@ -23,40 +23,15 @@ public class FunctionSymbol extends Symbol {
     public FunctionSymbol(String id, String returnType) {
         super(id, PrimitiveType.IDENTIFIER);
         args = new HashMap<String, Symbol>();
-        switch(returnType){
-            case "int":
-                this.returnType = PrimitiveType.INT;
-                break;
-            case "boolean":
-                this.returnType = PrimitiveType.BOOLEAN;
-                break;
-            case "int[]":
-                this.returnType = PrimitiveType.ARRAY;
-                break;
-            default:
-                this.returnType = PrimitiveType.IDENTIFIER;
-                break;
-        }
+        this.returnType = PrimitiveType.strToPrimitiveType(returnType);
     }
 
 
     public FunctionSymbol(String id, String returnType, Map<String, Symbol> args) {
         super(id, PrimitiveType.IDENTIFIER);
         this.args = args;
-        switch(returnType){
-            case "int":
-                this.returnType = PrimitiveType.INT;
-                break;
-            case "boolean":
-                this.returnType = PrimitiveType.BOOLEAN;
-                break;
-            case "int[]":
-                this.returnType = PrimitiveType.ARRAY;
-                break;
-            default:
-                this.returnType = PrimitiveType.IDENTIFIER;
-                break;
-        }
+        this.returnType = PrimitiveType.strToPrimitiveType(returnType);
+
     }
 
 

@@ -81,22 +81,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         String name = n.f1.accept(this, argu);
 
-        PrimitiveType type;
+        PrimitiveType type = PrimitiveType.strToPrimitiveType(strType);
 
-        switch(strType){
-            case "int":
-                type = PrimitiveType.INT;
-                break;
-            case "boolean":
-                type = PrimitiveType.BOOLEAN;
-                break;
-            case "int[]":
-                type = PrimitiveType.ARRAY;
-                break;
-            default:
-                type = PrimitiveType.IDENTIFIER;
-                break;
-        }
         Symbol symbol;
 
         if(type != PrimitiveType.IDENTIFIER){
@@ -343,22 +329,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         String name = n.f1.accept(this, argu);
 
-        PrimitiveType type;
+        PrimitiveType type = PrimitiveType.strToPrimitiveType(strType);
 
-        switch(strType){
-            case "int":
-                type = PrimitiveType.INT;
-                break;
-            case "boolean":
-                type = PrimitiveType.BOOLEAN;
-                break;
-            case "int[]":
-                type = PrimitiveType.ARRAY;
-                break;
-            default:
-                type = PrimitiveType.IDENTIFIER;
-                break;
-        }
         Symbol symbol;
 
         if(type != PrimitiveType.IDENTIFIER){
