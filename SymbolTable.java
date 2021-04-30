@@ -1,6 +1,6 @@
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SymbolTable {
@@ -12,12 +12,12 @@ public class SymbolTable {
     }
 
     public void enter(){
-        Map<String, Symbol> scope = new HashMap<String, Symbol>();
+        Map<String, Symbol> scope = new LinkedHashMap<String, Symbol>();
         table.push(scope);
     }
 
     public void enter(Map<String, Symbol> parentScope){
-        Map<String, Symbol> scope = new HashMap<String, Symbol>();
+        Map<String, Symbol> scope = new LinkedHashMap<String, Symbol>();
         scope.putAll(parentScope);
         table.push(scope);
         

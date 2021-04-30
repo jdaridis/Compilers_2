@@ -1,14 +1,14 @@
 enum PrimitiveType {
     INT("int", 4),
-    ARRAY("int[]", 4),
+    ARRAY("int[]", 8),
     BOOLEAN("boolean", 1),
-    IDENTIFIER;
+    IDENTIFIER(8);
 
 
     String typeName;
     int size;
-    PrimitiveType(){
-
+    PrimitiveType(int size){
+        this.size = size;
     }
     PrimitiveType(String name, int size){
         this.typeName = name;
@@ -39,6 +39,7 @@ enum PrimitiveType {
 public class Symbol {
     String id;
     PrimitiveType type;
+    int size;
     public Symbol(String id, PrimitiveType type) {
         this.id = id;
         this.type = type;
