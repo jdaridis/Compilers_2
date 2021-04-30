@@ -1,3 +1,4 @@
+import java.util.Collection;
 import java.util.Map;
 
 import syntaxtree.ArrayAssignmentStatement;
@@ -90,7 +91,9 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         } else {
             symbol = new ClassSymbol(name, strType);
         }
-        argu.insert(name, symbol);
+        if(argu.insert(name, symbol) != null){
+            throw new Exception("Duplicate use of name " + name); 
+        }
         
 
         return null;
@@ -199,24 +202,22 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
     }
 
-    private void parentEnterHelper(ClassDeclSymbol parent, SymbolTable table){
+    private void parentEnterHelper(ClassDeclSymbol parent, SymbolTable table, Map<String, Symbol> methods){
         if(parent.parentClass == null){
             table.enter(parent.fields);
-            table.enter(parent.methods);
+            methods.putAll(parent.methods);
         } else {
-            parentEnterHelper(parent.parentClass, table);
+            parentEnterHelper(parent.parentClass, table, methods);
             table.enter(parent.fields);
-            table.enter(parent.methods);
+            methods.putAll(parent.methods);
         }
     }
 
     private void parentExitHelper(ClassDeclSymbol parent, SymbolTable table){
         if(parent.parentClass == null){
             table.exit();
-            table.exit();
         } else {
             parentExitHelper(parent.parentClass, table);
-            table.exit();
             table.exit();
         }
     }
@@ -243,11 +244,10 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         ClassDeclSymbol parent = (ClassDeclSymbol) argu.lookup(parentName);
         ClassDeclSymbol symbol = new ClassDeclSymbol(className, parent);
-
         argu.insert(className, symbol);
         
         if(parent != null){
-            parentEnterHelper(parent, argu);
+            parentEnterHelper(parent, argu, symbol.methods);
         }
         // argu.print();
 
@@ -256,7 +256,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         n.f5.accept(this, argu);
 
-        argu.enter();
+        argu.enter(symbol.methods);
 
         n.f6.accept(this, argu);
         
@@ -294,13 +294,40 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         String methodName = n.f2.accept(this, argu);
         FunctionSymbol method = new FunctionSymbol(methodName, type);
         Map<String, Symbol> args;
-        argu.insert(methodName, method);
+        Symbol oldMethod;
+
+        oldMethod = argu.insert(methodName, method);
 
         argu.enter();
         n.f4.accept(this, argu);
-
         args = argu.peek();
         method.args.putAll(args);
+
+        if(oldMethod != null) {
+            if(oldMethod.type != PrimitiveType.IDENTIFIER){
+                throw new Exception("Duplicate use of name " + methodName);
+            }
+            FunctionSymbol overMethod = (FunctionSymbol)oldMethod;
+            
+            if(method.returnType != overMethod.returnType){
+                throw new Exception("Declared method has a different return type than the superclass");
+            }
+
+            if(method.args.size() != overMethod.args.size()){
+                throw new Exception("Declared method has a different number of args than the superclass");
+            }
+
+            Object[] currentArgs = method.args.values().toArray();
+            Object[] overArgs = overMethod.args.values().toArray();
+
+            for(int i=0;i<overArgs.length;i++){
+                if(((Symbol)overArgs[i]).type != ((Symbol)currentArgs[i]).type){
+                    throw new Exception("Declared method has a different type of args than the superclass");
+                }
+            }
+
+        }
+
         n.f7.accept(this, argu);
         n.f8.accept(this, argu);
         
@@ -310,7 +337,6 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         // argu.print();
         
         argu.exit();
-        System.out.println("Args " + method.args.values());
 
         return null;
     }
@@ -338,7 +364,9 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         } else {
             symbol = new ClassSymbol(name, strType);
         }
-        argu.insert(name, symbol);
+        if(argu.insert(name, symbol) != null){
+            throw new Exception("Duplicate use of name " + name);
+        }
         
 
         return null;

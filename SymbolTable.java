@@ -31,12 +31,13 @@ public class SymbolTable {
         return table.peek();
     }
 
-    public void insert(String name, Symbol symbol) throws Exception {
+    public Symbol insert(String name, Symbol symbol) throws Exception {
         Map<String, Symbol> scope = table.peek();
         if(scope.containsKey(name)){
-            throw new Exception("Duplicate use of name " + name); // TODO Fix message.
+            return scope.get(name);
         }
         scope.put(name, symbol);
+        return null;
     }
 
     public Symbol lookup(String name){
