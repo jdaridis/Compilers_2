@@ -323,6 +323,10 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
             for(int i=0;i<overArgs.length;i++){
                 if(((Symbol)overArgs[i]).type != ((Symbol)currentArgs[i]).type){
                     throw new Exception("Declared method has a different type of args than the superclass");
+                } else if(((Symbol)overArgs[i]).type == PrimitiveType.IDENTIFIER){
+                    if(((ClassSymbol)overArgs[i]).className != ((ClassSymbol)currentArgs[i]).className){
+                        throw new Exception("Declared method has a different type of args than the superclass");
+                    }
                 }
             }
 

@@ -23,6 +23,20 @@ public class ClassDeclSymbol extends Symbol {
         this.size = 0;
     }
 
+    private boolean isInstanceOfHelper(ClassDeclSymbol parent, ClassDeclSymbol child) {
+        if (child == null) {
+            return false;
+        } else if (parent.id == child.id) {
+            return true;
+        } else  {
+            return isInstanceOfHelper(parent, child.parentClass);
+        }
+    }
+
+    public boolean isInstanceOf(ClassDeclSymbol parent){
+        return isInstanceOfHelper(parent, this.parentClass);
+    }
+
 
     @Override
     public String toString() {
