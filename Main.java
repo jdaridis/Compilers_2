@@ -36,12 +36,12 @@ public class Main {
                     System.out.println(classSym.id + ":");
                     for(Symbol field: classSym.fields.values()){
                         System.out.println(classSym.id + "." + field.id + ":" + fieldOffset);
-                        fieldOffset += field.size;
+                        fieldOffset += field.type.size;
                     }
 
                     for(Symbol method: classSym.methods.values()){
                         System.out.println(classSym.id + "." + method.id + ":" + methodOffset);
-                        methodOffset += method.size;
+                        methodOffset += method.type.size;
                     }
                 }
             }
@@ -75,13 +75,7 @@ public class Main {
             } else {
                 size = computeClassSize(symbol.parentClass, table);
                 for(Symbol field: symbol.fields.values()){
-                    if(field.size == 0){
-                        ClassDeclSymbol type = (ClassDeclSymbol)table.lookupType(((ClassSymbol)field).className);
-                        field.size = computeClassSize(type, table);
-
-                        System.out.println("Size of " + field.id + " " + field.size);
-                    }
-                    size += field.size;
+                    size += field.type.size;
                 }
                 for(Symbol s: symbol.methods.values()){
                     size += symbol.size;
