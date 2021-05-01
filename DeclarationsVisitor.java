@@ -243,6 +243,11 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         Map<String, Symbol> methods;
 
         ClassDeclSymbol parent = (ClassDeclSymbol) argu.lookup(parentName);
+
+        if(parent == null){
+            throw new Exception("Type " + parentName + " not declared in file");
+        }
+
         ClassDeclSymbol symbol = new ClassDeclSymbol(className, parent);
         argu.insert(className, symbol);
         
