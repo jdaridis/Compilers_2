@@ -43,11 +43,13 @@ public class Symbol {
     public Symbol(String id, PrimitiveType type) {
         this.id = id;
         this.type = type;
+        this.size = type.size;
     }
 
     public Symbol(String id, String strType) {
         this.id = id;
         type = PrimitiveType.strToPrimitiveType(strType);
+        this.size = type.size;
     }
 
 

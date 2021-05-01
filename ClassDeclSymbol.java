@@ -12,6 +12,7 @@ public class ClassDeclSymbol extends Symbol {
         super(id, PrimitiveType.IDENTIFIER);
         fields = new LinkedHashMap<String, Symbol>();
         methods = new LinkedHashMap<String, Symbol>();
+        this.size = 0;
     }
 
     public ClassDeclSymbol(String id, ClassDeclSymbol parentClass) {
@@ -19,8 +20,9 @@ public class ClassDeclSymbol extends Symbol {
         this.parentClass = parentClass;
         fields = new LinkedHashMap<String, Symbol>();
         methods = new LinkedHashMap<String, Symbol>();
-
+        this.size = 0;
     }
+
 
     @Override
     public String toString() {
