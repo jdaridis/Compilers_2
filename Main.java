@@ -26,6 +26,24 @@ public class Main {
 
                 root.accept(declarations, symbolTable);
                 symbolTable.print();
+
+
+                for(Symbol s: symbolTable.peek().values()){
+                    ClassDeclSymbol classSym = (ClassDeclSymbol)s;
+                    int fieldOffset = computeClassSize(classSym.parentClass, symbolTable);
+                    int methodOffset = 0;
+
+                    System.out.println(classSym.id + ":");
+                    for(Symbol field: classSym.fields.values()){
+                        System.out.println(classSym.id + "." + field.id + ":" + fieldOffset);
+                        fieldOffset += field.size;
+                    }
+
+                    for(Symbol method: classSym.methods.values()){
+                        System.out.println(classSym.id + "." + method.id + ":" + methodOffset);
+                        methodOffset += method.size;
+                    }
+                }
             }
             catch(ParseException ex){
                 System.out.println(ex.getMessage());
@@ -43,6 +61,35 @@ public class Main {
             }
         }
 
+        
+    }
+
+
+    public static int computeClassSize(ClassDeclSymbol symbol, SymbolTable table){
+        int size;
+        if(symbol != null && symbol.size != 0){
+            return symbol.size;
+        } else {
+            if(symbol == null){
+                return 0;
+            } else {
+                size = computeClassSize(symbol.parentClass, table);
+                for(Symbol field: symbol.fields.values()){
+                    if(field.size == 0){
+                        ClassDeclSymbol type = (ClassDeclSymbol)table.lookupType(((ClassSymbol)field).className);
+                        field.size = computeClassSize(type, table);
+
+                        System.out.println("Size of " + field.id + " " + field.size);
+                    }
+                    size += field.size;
+                }
+                for(Symbol s: symbol.methods.values()){
+                    size += symbol.size;
+                }
+                symbol.size = size;
+                return size;
+            }
+        }
         
     }
 
