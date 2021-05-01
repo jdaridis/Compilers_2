@@ -1,4 +1,4 @@
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Map;
 
 import syntaxtree.ArrayAssignmentStatement;
@@ -307,28 +307,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
             if(oldMethod.type != PrimitiveType.IDENTIFIER){
                 throw new Exception("Duplicate use of name " + methodName);
             }
-            FunctionSymbol overMethod = (FunctionSymbol)oldMethod;
-            
-            if(method.returnType != overMethod.returnType){
-                throw new Exception("Declared method has a different return type than the superclass");
-            }
-
-            if(method.args.size() != overMethod.args.size()){
-                throw new Exception("Declared method has a different number of args than the superclass");
-            }
-
-            Object[] currentArgs = method.args.values().toArray();
-            Object[] overArgs = overMethod.args.values().toArray();
-
-            for(int i=0;i<overArgs.length;i++){
-                if(((Symbol)overArgs[i]).type != ((Symbol)currentArgs[i]).type){
-                    throw new Exception("Declared method has a different type of args than the superclass");
-                } else if(((Symbol)overArgs[i]).type == PrimitiveType.IDENTIFIER){
-                    if(((ClassSymbol)overArgs[i]).className != ((ClassSymbol)currentArgs[i]).className){
-                        throw new Exception("Declared method has a different type of args than the superclass");
-                    }
-                }
-            }
+            method.checkOverride((FunctionSymbol)oldMethod);
 
         }
 

@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,35 @@ public class FunctionSymbol extends Symbol {
         this.args = args;
         this.returnType = PrimitiveType.strToPrimitiveType(returnType);
 
+    }
+
+    public boolean checkOverride(FunctionSymbol override) throws Exception{
+        if(this.returnType != override.returnType){
+            throw new Exception("Declared method has a different return type than the superclass");
+        }
+
+        return checkArgs(override.args);
+    }
+
+
+    public boolean checkArgs(Map<String,Symbol> checkArgs) throws Exception {
+        Symbol[] argsArray = Arrays.copyOf(args.values().toArray(), args.size(), Symbol[].class);
+        Symbol[] checkArgsArray = Arrays.copyOf(checkArgs.values().toArray(), checkArgs.size(), Symbol[].class);
+
+        if(argsArray.length != checkArgsArray.length){
+            throw new Exception("Declared method has a different number of args than the superclass");
+        }
+
+        for(int i=0;i<argsArray.length;i++){
+            if(argsArray[i].type != checkArgsArray[i].type){
+                throw new Exception("Declared method has a different type of args than the superclass");
+            } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
+                if(((ClassSymbol)argsArray[i]).className != ((ClassSymbol)checkArgsArray[i]).className){
+                    throw new Exception("Declared method has a different type of args than the superclass");
+                }
+            }
+        }
+        return true;
     }
 
 
