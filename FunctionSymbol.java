@@ -38,6 +38,10 @@ public class FunctionSymbol extends Symbol {
     public boolean checkOverride(FunctionSymbol override) throws Exception{
         if(this.returnType != override.returnType){
             throw new Exception("Declared method has a different return type than the superclass");
+        } else if(this.returnType == PrimitiveType.IDENTIFIER){
+            if(!this.returnType.typeName.equals(override.returnType.typeName)){
+                throw new Exception("Declared method has a different type of args than the superclass");
+            }
         }
 
         return checkArgs(override.args);
@@ -56,7 +60,7 @@ public class FunctionSymbol extends Symbol {
             if(argsArray[i].type != checkArgsArray[i].type){
                 throw new Exception("Declared method has a different type of args than the superclass");
             } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
-                if(((ClassSymbol)argsArray[i]).className != ((ClassSymbol)checkArgsArray[i]).className){
+                if(!argsArray[i].type.typeName.equals(checkArgsArray[i].type.typeName)){
                     throw new Exception("Declared method has a different type of args than the superclass");
                 }
             }

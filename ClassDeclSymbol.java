@@ -26,7 +26,7 @@ public class ClassDeclSymbol extends Symbol {
     private boolean isInstanceOfHelper(ClassDeclSymbol parent, ClassDeclSymbol child) {
         if (child == null) {
             return false;
-        } else if (parent.id == child.id) {
+        } else if (parent.id.equals(child.id)) {
             return true;
         } else  {
             return isInstanceOfHelper(parent, child.parentClass);

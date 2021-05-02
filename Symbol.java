@@ -29,6 +29,7 @@ enum PrimitiveType {
                 break;
             default:
                 type = IDENTIFIER;
+                type.typeName = strType;
                 break;
         }
         return type;
