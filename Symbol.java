@@ -29,10 +29,20 @@ enum PrimitiveType {
                 break;
             default:
                 type = IDENTIFIER;
-                type.typeName = strType;
                 break;
         }
+
+        
         return type;
+    }
+    public String getTypeName() {
+        return typeName;
+    }
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+    public int getSize() {
+        return size;
     }
 
 }

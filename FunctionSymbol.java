@@ -3,19 +3,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FunctionSymbol extends Symbol {
-    PrimitiveType returnType;
+    TypeSymbol returnType;
     Map<String, Symbol> args; //Check this later.
 
     
 
-    public FunctionSymbol(String id, PrimitiveType returnType) {
+    public FunctionSymbol(String id, TypeSymbol returnType) {
         super(id, PrimitiveType.IDENTIFIER);
         args = new HashMap<String, Symbol>();
         this.returnType = returnType;
     }
 
 
-    public FunctionSymbol(String id, PrimitiveType returnType, Map<String, Symbol> args) {
+    public FunctionSymbol(String id, TypeSymbol returnType, Map<String, Symbol> args) {
         super(id, PrimitiveType.IDENTIFIER);
         this.returnType = returnType;
         this.args = args;
@@ -24,22 +24,31 @@ public class FunctionSymbol extends Symbol {
     public FunctionSymbol(String id, String returnType) {
         super(id, PrimitiveType.IDENTIFIER);
         args = new HashMap<String, Symbol>();
-        this.returnType = PrimitiveType.strToPrimitiveType(returnType);
+        if(type == PrimitiveType.IDENTIFIER){
+            this.returnType = new TypeSymbol(returnType);
+        } else {
+            this.returnType = new TypeSymbol(type);
+        }
     }
 
 
     public FunctionSymbol(String id, String returnType, Map<String, Symbol> args) {
         super(id, PrimitiveType.IDENTIFIER);
         this.args = args;
-        this.returnType = PrimitiveType.strToPrimitiveType(returnType);
+        PrimitiveType type = PrimitiveType.strToPrimitiveType(returnType);
+        if(type == PrimitiveType.IDENTIFIER){
+            this.returnType = new TypeSymbol(returnType);
+        } else {
+            this.returnType = new TypeSymbol(type);
+        }
 
     }
 
     public boolean checkOverride(FunctionSymbol override) throws Exception{
         if(this.returnType != override.returnType){
             throw new Exception("Declared method has a different return type than the superclass");
-        } else if(this.returnType == PrimitiveType.IDENTIFIER){
-            if(!this.returnType.typeName.equals(override.returnType.typeName)){
+        } else if(this.returnType.type == PrimitiveType.IDENTIFIER){
+            if(!this.returnType.id.equals(override.returnType.id)){
                 throw new Exception("Declared method has a different type of args than the superclass");
             }
         }
@@ -60,7 +69,7 @@ public class FunctionSymbol extends Symbol {
             if(argsArray[i].type != checkArgsArray[i].type){
                 throw new Exception("Declared method has a different type of args than the superclass");
             } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
-                if(!argsArray[i].type.typeName.equals(checkArgsArray[i].type.typeName)){
+                if(!((ClassSymbol)argsArray[i]).className.equals(((ClassSymbol)checkArgsArray[i]).className)){
                     throw new Exception("Declared method has a different type of args than the superclass");
                 }
             }
@@ -74,13 +83,13 @@ public class FunctionSymbol extends Symbol {
         // TODO Auto-generated method stub
         String ret;
         if(args.size() != 0){
-            ret = returnType.typeName + " " + id + "(";
+            ret = returnType.type.getTypeName() + " " + id + "(";
             for(Symbol s:args.values()){
                 ret += s.toString();
             }
             ret += ")";
         } else {
-            ret = returnType.typeName + " " + id + "()";
+            ret = returnType.type.getTypeName() + " " + id + "()";
         }
         return ret;
     }

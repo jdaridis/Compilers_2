@@ -4,14 +4,12 @@ public class ClassSymbol extends ClassDeclSymbol {
     public ClassSymbol(String id, String className) {
         super(id);
         this.className = className;
-        this.type.typeName = className;
 
     }
 
     public ClassSymbol(String id, String className, ClassDeclSymbol type) {
         super(id);
         this.className = className;
-        this.type.typeName = className;
 
         this.parentClass = type.parentClass;
         this.fields = type.fields;
@@ -22,7 +20,6 @@ public class ClassSymbol extends ClassDeclSymbol {
     public ClassSymbol(String id, ClassDeclSymbol type) {
         super(id);
         this.className = type.id;
-        this.type.typeName = type.id;
 
 
         this.parentClass = type.parentClass;
@@ -44,7 +41,7 @@ public class ClassSymbol extends ClassDeclSymbol {
     @Override
     public String toString() {
         // TODO Auto-generated method stub
-        String ret = type.typeName + " " + id;
+        String ret = className + " " + id;
         return ret;
     }
 }
