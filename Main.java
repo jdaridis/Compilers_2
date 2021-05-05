@@ -27,21 +27,24 @@ public class Main {
                 root.accept(declarations, symbolTable);
                 symbolTable.print();
 
+                TypesVisitor typeCheck = new TypesVisitor();
+
+                root.accept(typeCheck, symbolTable);
+
 
                 for(Symbol s: symbolTable.peek().values()){
                     ClassDeclSymbol classSym = (ClassDeclSymbol)s;
                     int fieldOffset = computeClassSize(classSym.parentClass, symbolTable);
                     int methodOffset = 0;
 
-                    System.out.println(classSym.id + ":");
                     for(Symbol field: classSym.fields.values()){
                         System.out.println(classSym.id + "." + field.id + ":" + fieldOffset);
-                        fieldOffset += field.type.size;
+                        fieldOffset += field.type.getSize();
                     }
 
                     for(Symbol method: classSym.methods.values()){
                         System.out.println(classSym.id + "." + method.id + ":" + methodOffset);
-                        methodOffset += method.type.size;
+                        methodOffset += method.type.getSize();
                     }
                 }
             }
@@ -75,7 +78,7 @@ public class Main {
             } else {
                 size = computeClassSize(symbol.parentClass, table);
                 for(Symbol field: symbol.fields.values()){
-                    size += field.type.size;
+                    size += field.type.getSize();
                 }
                 for(Symbol s: symbol.methods.values()){
                     size += symbol.size;
