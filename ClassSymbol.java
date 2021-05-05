@@ -38,6 +38,26 @@ public class ClassSymbol extends ClassDeclSymbol {
         }
     }
 
+    private boolean isParentOfHelper(ClassSymbol parent, ClassDeclSymbol child) {
+        if (child == null) {
+            return false;
+        } else if (parent.className.equals(child.id)) {
+            return true;
+        } else  {
+            return isParentOfHelper(parent, child.parentClass);
+        }
+    }
+
+    @Override
+    public boolean isParentOf(ClassDeclSymbol child) {
+        // TODO Auto-generated method stub
+        if (this.className.equals(child.id)) {
+            return true;
+        } else {
+            return isParentOfHelper(this, child.parentClass);
+        }
+    }
+
     @Override
     public String toString() {
         // TODO Auto-generated method stub

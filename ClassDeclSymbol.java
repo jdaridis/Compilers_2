@@ -24,6 +24,7 @@ public class ClassDeclSymbol extends Symbol {
     }
 
     private boolean isInstanceOfHelper(ClassDeclSymbol parent, ClassDeclSymbol child) {
+        System.out.println("Parent: " + parent + ", Child: " + child);
         if (child == null) {
             return false;
         } else if (parent.id.equals(child.id)) {
@@ -34,7 +35,20 @@ public class ClassDeclSymbol extends Symbol {
     }
 
     public boolean isInstanceOf(ClassDeclSymbol parent){
-        return isInstanceOfHelper(parent, this.parentClass);
+        if (this.id.equals(parent.id)) {
+            return true;
+        } else {
+            return isInstanceOfHelper(parent, this.parentClass);
+        }
+
+    }
+
+    public boolean isParentOf(ClassDeclSymbol child){
+        if (this.id.equals(child.id)) {
+            return true;
+        } else {
+            return isInstanceOfHelper(this, child.parentClass);
+        }
     }
 
 

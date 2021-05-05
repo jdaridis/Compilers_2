@@ -18,6 +18,7 @@ import syntaxtree.Expression;
 import syntaxtree.FalseLiteral;
 import syntaxtree.FormalParameter;
 import syntaxtree.Identifier;
+import syntaxtree.IfStatement;
 import syntaxtree.IntegerLiteral;
 import syntaxtree.IntegerType;
 import syntaxtree.MainClass;
@@ -27,10 +28,12 @@ import syntaxtree.MinusExpression;
 import syntaxtree.NotExpression;
 import syntaxtree.PlusExpression;
 import syntaxtree.PrimaryExpression;
+import syntaxtree.PrintStatement;
 import syntaxtree.ThisExpression;
 import syntaxtree.TimesExpression;
 import syntaxtree.TrueLiteral;
 import syntaxtree.VarDeclaration;
+import syntaxtree.WhileStatement;
 import visitor.GJDepthFirst;
 
 public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
@@ -77,9 +80,9 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
     public PrimitiveType visit(VarDeclaration n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
         PrimitiveType type = n.f0.accept(this, argu);
+        String typeName = type.getTypeName();
 
-        String name = n.f1.accept(this, argu).getTypeName();;
-        String typeName = type.getTypeName();;
+        String name = n.f1.accept(this, argu).getTypeName();
         Symbol symbol;
 
         if(type != PrimitiveType.IDENTIFIER){
@@ -122,8 +125,16 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         PrimitiveType exprType = n.f2.accept(this, argu);
 
         if(symbol.type != exprType){
-            throw new Exception("Wrong type assignment");
-        } 
+            throw new Exception("Wrong type assignment. Expected: " + symbol.type.typeName + " but got: " + exprType.typeName);
+        } else if(symbol.type == PrimitiveType.IDENTIFIER){
+            ClassSymbol classSymbol = (ClassSymbol)symbol;
+
+            ClassDeclSymbol exprClass = argu.lookupType(exprType.getTypeName());
+
+            if(!classSymbol.isParentOf(exprClass)){
+                throw new Exception("Type " + exprClass.id + " not instance of " + classSymbol.className);
+            }
+        }
 
         return null;
     }
@@ -148,6 +159,70 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
             throw new Exception("Next time, do us the favor and declare the variable " + name);
         }
         return super.visit(n, argu);
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> "if"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     * f5 -> "else"
+     * f6 -> Statement()
+     */
+
+    @Override
+    public PrimitiveType visit(IfStatement n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+
+        PrimitiveType expression = n.f2.accept(this, argu);
+
+        if(expression != PrimitiveType.BOOLEAN){
+            throw new Exception("Only boolean expression allowed");
+        }
+
+        return null;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> "while"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     */
+
+    @Override
+    public PrimitiveType visit(WhileStatement n, SymbolTable argu) throws Exception {
+        PrimitiveType expression = n.f2.accept(this, argu);
+
+        if(expression != PrimitiveType.BOOLEAN){
+            throw new Exception("Only boolean expression allowed");
+        }
+
+        return null;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> "System.out.println"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
+
+    @Override
+    public PrimitiveType visit(PrintStatement n, SymbolTable argu) throws Exception {
+        PrimitiveType expression = n.f2.accept(this, argu);
+
+        if(expression != PrimitiveType.INT){
+            throw new Exception("Only int expression allowed");
+        }
+
+        return null;
     }
 
     /**
@@ -183,7 +258,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         PrimitiveType clause1 = n.f0.accept(this, argu);
         PrimitiveType clause2 = n.f2.accept(this, argu);
 
-        if(clause1 != PrimitiveType.BOOLEAN && clause2 != PrimitiveType.BOOLEAN){
+        if(clause1 != PrimitiveType.BOOLEAN || clause2 != PrimitiveType.BOOLEAN){
             throw new Exception("Types must be boolean");
         }
 
@@ -203,7 +278,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         PrimitiveType expr1 = n.f0.accept(this, argu);
         PrimitiveType expr2 = n.f2.accept(this, argu);
 
-        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+        if(expr1 != PrimitiveType.INT || expr2 != PrimitiveType.INT){
             throw new Exception("Types must be integers");
         }
 
@@ -223,7 +298,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         PrimitiveType expr1 = n.f0.accept(this, argu);
         PrimitiveType expr2 = n.f2.accept(this, argu);
 
-        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+        if(expr1 != PrimitiveType.INT || expr2 != PrimitiveType.INT){
             throw new Exception("Types must be integers");
         }
 
@@ -243,7 +318,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         PrimitiveType expr1 = n.f0.accept(this, argu);
         PrimitiveType expr2 = n.f2.accept(this, argu);
 
-        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+        if(expr1 != PrimitiveType.INT || expr2 != PrimitiveType.INT){
             throw new Exception("Types must be integers");
         }
 
@@ -263,7 +338,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         PrimitiveType expr1 = n.f0.accept(this, argu);
         PrimitiveType expr2 = n.f2.accept(this, argu);
 
-        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+        if(expr1 != PrimitiveType.INT || expr2 != PrimitiveType.INT){
             throw new Exception("Types must be integers");
         }
 
@@ -365,7 +440,24 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
     @Override
     public PrimitiveType visit(PrimaryExpression n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        return n.f0.accept(this, argu);
+
+
+        PrimitiveType type = n.f0.accept(this, argu);
+        String name = type.getTypeName();
+        Symbol symbol;
+
+
+        // System.out.println("PrimitiveType " + type + " "+ name);
+        if(name.equals("this")){
+            return type;
+        }
+
+        if(type == PrimitiveType.IDENTIFIER){
+            symbol = argu.lookup(name);
+            type = symbol.type;
+        }
+
+        return type;
     }
     
     /**

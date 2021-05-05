@@ -156,7 +156,7 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     @Override
     public String visit(PrimaryExpression n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        String name = super.visit(n, argu);
+        String name = n.f0.accept(this, argu);
 
         if(name != null){
             if(argu.lookup(name) == null){
