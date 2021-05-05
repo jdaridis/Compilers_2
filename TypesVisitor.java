@@ -1,23 +1,34 @@
 import java.util.Map;
 
 import syntaxtree.AllocationExpression;
+import syntaxtree.AndExpression;
 import syntaxtree.ArrayAllocationExpression;
 import syntaxtree.ArrayAssignmentStatement;
+import syntaxtree.ArrayLength;
+import syntaxtree.ArrayLookup;
 import syntaxtree.ArrayType;
 import syntaxtree.AssignmentStatement;
 import syntaxtree.BooleanType;
 import syntaxtree.BracketExpression;
 import syntaxtree.ClassDeclaration;
 import syntaxtree.ClassExtendsDeclaration;
+import syntaxtree.Clause;
+import syntaxtree.CompareExpression;
+import syntaxtree.Expression;
 import syntaxtree.FalseLiteral;
 import syntaxtree.FormalParameter;
 import syntaxtree.Identifier;
 import syntaxtree.IntegerLiteral;
 import syntaxtree.IntegerType;
 import syntaxtree.MainClass;
+import syntaxtree.MessageSend;
 import syntaxtree.MethodDeclaration;
+import syntaxtree.MinusExpression;
+import syntaxtree.NotExpression;
+import syntaxtree.PlusExpression;
 import syntaxtree.PrimaryExpression;
 import syntaxtree.ThisExpression;
+import syntaxtree.TimesExpression;
 import syntaxtree.TrueLiteral;
 import syntaxtree.VarDeclaration;
 import visitor.GJDepthFirst;
@@ -102,11 +113,19 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         // TODO Auto-generated method stub
         String name = n.f0.accept(this, argu).getTypeName();
 
-        if(argu.lookup(name) == null){
+        Symbol symbol = argu.lookup(name);
+
+        if(symbol == null){
             throw new Exception("Next time, do us the favor and declare the variable " + name);
         }
 
-        return super.visit(n, argu);
+        PrimitiveType exprType = n.f2.accept(this, argu);
+
+        if(symbol.type != exprType){
+            throw new Exception("Wrong type assignment");
+        } 
+
+        return null;
     }
 
     /**
@@ -133,6 +152,206 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
 
     /**
      * Grammar production:
+     * f0 -> AndExpression()
+     *       | CompareExpression()
+     *       | PlusExpression()
+     *       | MinusExpression()
+     *       | TimesExpression()
+     *       | ArrayLookup()
+     *       | ArrayLength()
+     *       | MessageSend()
+     *       | Clause()
+     */
+    
+    @Override
+    public PrimitiveType visit(Expression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return n.f0.accept(this, argu);
+    }
+
+    
+    /**
+     * Grammar production:
+     * f0 -> Clause()
+     * f1 -> "&&"
+     * f2 -> Clause()
+     */
+    @Override
+    public PrimitiveType visit(AndExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+
+        PrimitiveType clause1 = n.f0.accept(this, argu);
+        PrimitiveType clause2 = n.f2.accept(this, argu);
+
+        if(clause1 != PrimitiveType.BOOLEAN && clause2 != PrimitiveType.BOOLEAN){
+            throw new Exception("Types must be boolean");
+        }
+
+        return PrimitiveType.BOOLEAN;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "<"
+     * f2 -> PrimaryExpression()
+     */
+
+    @Override
+    public PrimitiveType visit(CompareExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f0.accept(this, argu);
+        PrimitiveType expr2 = n.f2.accept(this, argu);
+
+        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+            throw new Exception("Types must be integers");
+        }
+
+        return PrimitiveType.BOOLEAN;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "+"
+     * f2 -> PrimaryExpression()
+     */
+
+    @Override
+    public PrimitiveType visit(PlusExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f0.accept(this, argu);
+        PrimitiveType expr2 = n.f2.accept(this, argu);
+
+        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+            throw new Exception("Types must be integers");
+        }
+
+        return PrimitiveType.INT;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "-"
+     * f2 -> PrimaryExpression()
+     */
+
+    @Override
+    public PrimitiveType visit(MinusExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f0.accept(this, argu);
+        PrimitiveType expr2 = n.f2.accept(this, argu);
+
+        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+            throw new Exception("Types must be integers");
+        }
+
+        return PrimitiveType.INT;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "*"
+     * f2 -> PrimaryExpression()
+     */
+
+    @Override
+    public PrimitiveType visit(TimesExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f0.accept(this, argu);
+        PrimitiveType expr2 = n.f2.accept(this, argu);
+
+        if(expr1 != PrimitiveType.INT && expr2 != PrimitiveType.INT){
+            throw new Exception("Types must be integers");
+        }
+
+        return PrimitiveType.INT;
+    }
+
+        /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "["
+     * f2 -> PrimaryExpression()
+     * f3 -> "]"
+     */
+
+    @Override
+    public PrimitiveType visit(ArrayLookup n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f0.accept(this, argu);
+        PrimitiveType expr2 = n.f2.accept(this, argu);
+
+        if(expr1 != PrimitiveType.ARRAY){
+            throw new Exception("Type must be array");
+        }
+
+        if(expr2 != PrimitiveType.INT){
+            throw new Exception("Array index must be an integer");
+        }
+
+        return PrimitiveType.INT;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "."
+     * f2 -> "length"
+     */
+
+    @Override
+    public PrimitiveType visit(ArrayLength n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f0.accept(this, argu);
+
+        if(expr1 != PrimitiveType.ARRAY){
+            throw new Exception("Type must be array");
+        }
+
+        return PrimitiveType.INT;
+    }
+
+    @Override
+    public PrimitiveType visit(MessageSend n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return super.visit(n, argu);
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> NotExpression()
+     *       | PrimaryExpression()
+     */
+
+    @Override
+    public PrimitiveType visit(Clause n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return n.f0.accept(this, argu);
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> "!"
+     * f1 -> Clause()
+     */
+
+    @Override
+    public PrimitiveType visit(NotExpression n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        PrimitiveType expr1 = n.f1.accept(this, argu);
+
+        if(expr1 != PrimitiveType.BOOLEAN){
+            throw new Exception("Type must be boolean");
+        }
+
+        return PrimitiveType.BOOLEAN;
+    }
+
+    /**
+     * Grammar production:
      * f0 -> IntegerLiteral()
      *       | TrueLiteral()
      *       | FalseLiteral()
@@ -146,7 +365,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
     @Override
     public PrimitiveType visit(PrimaryExpression n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        return super.visit(n, argu);
+        return n.f0.accept(this, argu);
     }
     
     /**
@@ -161,6 +380,13 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
     @Override
 	public PrimitiveType visit(ArrayAllocationExpression n, SymbolTable argu) throws Exception {
 		// TODO Auto-generated method stub
+
+        PrimitiveType expr1 = n.f3.accept(this, argu);
+
+        if(expr1 != PrimitiveType.INT){
+            throw new Exception("Array index must be an integer");
+        }
+
 		return PrimitiveType.ARRAY;
 	}
 
@@ -198,9 +424,6 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
 		return n.f1.accept(this, argu);
 	}
 
-    
-
-
 	/**
      * Grammar production:
      * f0 -> "class"
@@ -233,14 +456,12 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
 
     }
 
-    private void parentEnterHelper(ClassDeclSymbol parent, SymbolTable table, Map<String, Symbol> methods){
+    private void parentEnterHelper(ClassDeclSymbol parent, SymbolTable table){
         if(parent.parentClass == null){
             table.enter(parent.fields);
-            methods.putAll(parent.methods);
         } else {
-            parentEnterHelper(parent.parentClass, table, methods);
+            parentEnterHelper(parent.parentClass, table);
             table.enter(parent.fields);
-            methods.putAll(parent.methods);
         }
     }
 
@@ -270,19 +491,17 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
         // TODO Auto-generated method stub
         String className = n.f1.accept(this, argu).getTypeName(); 
         String parentName = n.f3.accept(this, argu).getTypeName();
-        Map<String, Symbol> fields;
-        Map<String, Symbol> methods;
 
-        ClassDeclSymbol parent = (ClassDeclSymbol) argu.lookup(parentName);
+        ClassDeclSymbol parent = argu.lookupType(parentName);
 
         if(parent == null){
             throw new Exception("Type " + parentName + " not declared in file");
         }
 
-        ClassDeclSymbol symbol = new ClassDeclSymbol(className, parent);
+        ClassDeclSymbol symbol = argu.lookupType(className);
         
         if(parent != null){
-            parentEnterHelper(parent, argu, symbol.methods);
+            parentEnterHelper(parent, argu);
         }
         // argu.print();
 
@@ -295,11 +514,8 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
 
         n.f6.accept(this, argu);
         
-        // argu.print();
-        methods = argu.exit();
-        fields = argu.exit();
-        symbol.fields.putAll(fields);
-        symbol.methods.putAll(methods);
+        argu.exit();
+        argu.exit();
         
         parentExitHelper(parent, argu);
         
@@ -325,24 +541,44 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
 
     @Override
     public PrimitiveType visit(MethodDeclaration n, SymbolTable argu) throws Exception {
-        n.f1.accept(this, argu);
+        PrimitiveType returnType = n.f1.accept(this, argu);
+        String returnTypeName = returnType.getTypeName();
+        ClassDeclSymbol classSym = null;
+        if(returnType == PrimitiveType.IDENTIFIER){
+            classSym = (ClassDeclSymbol)argu.lookupType(returnTypeName);
+            if(classSym == null){
+                throw new Exception("Type " + returnTypeName + " not defined");
+            }
+        }
 
-        String methodName = n.f2.accept(this, argu).getTypeName();
 
-        FunctionSymbol method = (FunctionSymbol)argu.lookup(methodName);
-        Map<String, Symbol> args;
+        n.f2.accept(this, argu);
 
         argu.enter();
+
         n.f4.accept(this, argu);
-
-
         n.f7.accept(this, argu);
         n.f8.accept(this, argu);
         
 
-        PrimitiveType returnType = n.f10.accept(this, argu);
+        PrimitiveType expressionType = n.f10.accept(this, argu);
 
-        
+        if(expressionType != returnType){
+            throw new Exception("Return type mismatch");
+        } else if(expressionType == PrimitiveType.IDENTIFIER){
+            ClassDeclSymbol exprClass = argu.lookupType(expressionType.getTypeName());
+            ClassSymbol exprSymbol;
+            if(exprClass == null){
+                throw new Exception("Type " + expressionType.getTypeName() + " not defined");
+            } else {
+                exprSymbol = new ClassSymbol("return", exprClass);
+            }
+            
+            if(!exprSymbol.isInstanceOf(classSym)) {
+                throw new Exception("Type " + exprSymbol.className + " not instance of " + classSym.id);
+            }
+            
+        }
 
         
         argu.exit();
