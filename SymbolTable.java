@@ -33,11 +33,7 @@ public class SymbolTable {
 
     public Symbol insert(String name, Symbol symbol) throws Exception {
         Map<String, Symbol> scope = table.peek();
-        if(scope.containsKey(name)){
-            return scope.get(name);
-        }
-        scope.put(name, symbol);
-        return null;
+        return scope.putIfAbsent(name, symbol);
     }
 
     public Symbol lookup(String name){
@@ -47,6 +43,46 @@ public class SymbolTable {
                 continue;
             } else {
                 found = true;
+                return scope.get(name);
+            }
+        }
+
+        if(!found){
+            return null;
+        }
+        return null;
+    }
+
+    public Symbol lookupField(String name){
+        boolean found = false;
+        for(Map<String, Symbol> scope: table){
+            if(!scope.containsKey(name)){
+                continue;
+            } else {
+                found = true;
+                if(scope.get(name) instanceof FunctionSymbol){
+                    continue;
+                }
+                return scope.get(name);
+            }
+        }
+
+        if(!found){
+            return null;
+        }
+        return null;
+    }
+
+    public FunctionSymbol lookupMethod(String name){
+        boolean found = false;
+        for(Map<String, Symbol> scope: table){
+            if(!scope.containsKey(name)){
+                continue;
+            } else {
+                found = true;
+                if(!(scope.get(name) instanceof FunctionSymbol)){
+                    continue;
+                }
                 return scope.get(name);
             }
         }

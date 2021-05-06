@@ -297,6 +297,10 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
     public String visit(MethodDeclaration n, SymbolTable argu) throws Exception {
         String type = n.f1.accept(this, argu);
         String methodName = n.f2.accept(this, argu);
+
+        if(argu.lookupType(methodName) != null){
+            throw new Exception("Cannot have method with name of class");
+        }
         FunctionSymbol method = new FunctionSymbol(methodName, type);
         Map<String, Symbol> args;
         Symbol oldMethod;

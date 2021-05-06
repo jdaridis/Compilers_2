@@ -116,7 +116,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         // TODO Auto-generated method stub
         String name = n.f0.accept(this, argu).getTypeName();
 
-        Symbol symbol = argu.lookup(name);
+        Symbol symbol = argu.lookupField(name);
 
         if(symbol == null){
             throw new Exception("Next time, do us the favor and declare the variable " + name);
@@ -466,7 +466,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         }
 
         if(type.type == PrimitiveType.IDENTIFIER){
-            symbol = argu.lookup(name);
+            symbol = argu.lookupField(name);
             if(symbol.type != PrimitiveType.IDENTIFIER){
                 type = new TypeSymbol(symbol.type);
             } else {
@@ -552,6 +552,12 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         argu.enter();
 
         n.f3.accept(this, argu);
+
+        for(Symbol s: symbol.methods.values()){
+            if(argu.lookupType(s.id) != null){
+                throw new Exception("Cannot have method with name of class");
+            }
+        }
 
         argu.enter(symbol.methods);
 
@@ -661,8 +667,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         }
 
 
-        n.f2.accept(this, argu);
-
+        n.f2.accept(this, argu).getTypeName();
         argu.enter();
 
         n.f4.accept(this, argu);
@@ -673,7 +678,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expressionType = n.f10.accept(this, argu);
 
         if(expressionType.type != returnType.type){
-            throw new Exception("Return type mismatch");
+            throw new Exception("Return type mismatch. Expected: " + returnType.getTypeName() + " but got: " + expressionType.getTypeName());
         } else if(expressionType.type == PrimitiveType.IDENTIFIER){
             ClassDeclSymbol exprClass = argu.lookupType(expressionType.getTypeName());
             ClassSymbol exprSymbol;
