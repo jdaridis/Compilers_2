@@ -131,7 +131,7 @@ public class TypesVisitor extends GJDepthFirst<PrimitiveType, SymbolTable>  {
 
             ClassDeclSymbol exprClass = argu.lookupType(exprType.getTypeName());
 
-            if(!classSymbol.isParentOf(exprClass)){
+            if(!exprClass.isInstanceOf(classSymbol)){
                 throw new Exception("Type " + exprClass.id + " not instance of " + classSymbol.className);
             }
         }

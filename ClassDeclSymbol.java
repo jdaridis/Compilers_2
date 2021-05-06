@@ -43,6 +43,25 @@ public class ClassDeclSymbol extends Symbol {
 
     }
 
+    private boolean isInstanceOfHelper(ClassSymbol parent, ClassDeclSymbol child) {
+        if (child == null) {
+            return false;
+        } else if (parent.className.equals(child.id)) {
+            return true;
+        } else  {
+            return isInstanceOfHelper(parent, child.parentClass);
+        }
+    }
+
+    public boolean isInstanceOf(ClassSymbol parent){
+        if (this.id.equals(parent.className)) {
+            return true;
+        } else {
+            return isInstanceOfHelper(parent, this.parentClass);
+        }
+
+    }
+
     public boolean isParentOf(ClassDeclSymbol child){
         if (this.id.equals(child.id)) {
             return true;
