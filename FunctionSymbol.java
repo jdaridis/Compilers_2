@@ -24,6 +24,7 @@ public class FunctionSymbol extends Symbol {
     public FunctionSymbol(String id, String returnType) {
         super(id, PrimitiveType.IDENTIFIER);
         args = new HashMap<String, Symbol>();
+        PrimitiveType type = PrimitiveType.strToPrimitiveType(returnType);
         if(type == PrimitiveType.IDENTIFIER){
             this.returnType = new TypeSymbol(returnType);
         } else {
@@ -45,7 +46,7 @@ public class FunctionSymbol extends Symbol {
     }
 
     public boolean checkOverride(FunctionSymbol override) throws Exception{
-        if(this.returnType != override.returnType){
+        if(this.returnType.type != override.returnType.type){
             throw new Exception("Declared method has a different return type than the superclass");
         } else if(this.returnType.type == PrimitiveType.IDENTIFIER){
             if(!this.returnType.id.equals(override.returnType.id)){
@@ -83,13 +84,13 @@ public class FunctionSymbol extends Symbol {
         // TODO Auto-generated method stub
         String ret;
         if(args.size() != 0){
-            ret = returnType.type.getTypeName() + " " + id + "(";
+            ret = returnType.getTypeName() + " " + id + "(";
             for(Symbol s:args.values()){
                 ret += s.toString();
             }
             ret += ")";
         } else {
-            ret = returnType.type.getTypeName() + " " + id + "()";
+            ret = returnType.getTypeName() + " " + id + "()";
         }
         return ret;
     }
