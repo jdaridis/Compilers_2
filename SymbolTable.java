@@ -6,6 +6,7 @@ import java.util.Map;
 public class SymbolTable {
 
     Deque<Map<String, Symbol>> table;
+    ClassDeclSymbol thisSymbol;
 
     public SymbolTable() {
         table = new ArrayDeque<Map<String, Symbol>>();
@@ -104,6 +105,18 @@ public class SymbolTable {
         } else {
             return null;
         }
+    }
+
+    public void insertThis(String name){
+        thisSymbol = lookupType(name);
+    }
+
+    public void insertThis(ClassDeclSymbol symbol){
+        thisSymbol = symbol;
+    }
+
+    public ClassDeclSymbol getThis(){
+        return thisSymbol;
     }
 
     public void print(){

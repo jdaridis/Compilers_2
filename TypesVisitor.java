@@ -28,6 +28,7 @@ import syntaxtree.MainClass;
 import syntaxtree.MessageSend;
 import syntaxtree.MethodDeclaration;
 import syntaxtree.MinusExpression;
+import syntaxtree.Node;
 import syntaxtree.NotExpression;
 import syntaxtree.PlusExpression;
 import syntaxtree.PrimaryExpression;
@@ -134,6 +135,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
 
             ClassDeclSymbol exprClass = argu.lookupType(exprType.getTypeName());
 
+
             if(!exprClass.isInstanceOf(classSymbol)){
                 throw new Exception("Type " + exprClass.id + " not instance of " + classSymbol.className);
             }
@@ -156,10 +158,17 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
     @Override
     public TypeSymbol visit(ArrayAssignmentStatement n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        TypeSymbol array = n.f0.accept(this, argu);
 
-        if(array.type != PrimitiveType.ARRAY){
-            throw new Exception("Type must be array");
+        String name = n.f0.accept(this, argu).getTypeName();
+
+        Symbol symbol = argu.lookupField(name);
+
+        if(symbol == null){
+            throw new Exception("Next time, do us the favor and declare the variable " + name);
+        }
+
+        if(symbol.type != PrimitiveType.ARRAY){
+            throw new Exception("Type must be array. Was " + symbol.type.getTypeName());
         }
 
         TypeSymbol index = n.f2.accept(this, argu);
@@ -435,18 +444,23 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
                 throw new Exception("Method " + methodName + " not defined");
             }
         } else {
-            ClassSymbol classSymbol = (ClassSymbol)argu.lookup(expression.getTypeName());
-            
+            ClassDeclSymbol classSymbol = (ClassDeclSymbol)argu.lookup(expression.getTypeName());
 
             method = (FunctionSymbol)classSymbol.methods.get(methodName);
 
             if(method == null){
-                throw new Exception("Method " + methodName + " not defined");
+                throw new Exception("Method " + methodName + " not defined in class " + classSymbol.id);
             }
 
         }
+        Map<String, Symbol> args;
+        argu.enter();
 
-        
+        n.f4.accept(this, argu);
+
+        args = argu.exit();
+
+        method.checkArgs(args, argu);
 
         return method.returnType;
     }
@@ -460,7 +474,11 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
     @Override
     public TypeSymbol visit(ExpressionList n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        return super.visit(n, argu);
+        TypeSymbol arg;
+        arg = n.f0.accept(this, argu);
+        argu.insert("arg0", arg);
+        n.f1.accept(this, argu);
+        return null;
     }
 
     /**
@@ -471,7 +489,15 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
     @Override
     public TypeSymbol visit(ExpressionTail n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
-        return super.visit(n, argu);
+        int i = 1;
+        TypeSymbol arg;
+        for(Node node: n.f0.nodes){
+            arg = node.accept(this, argu);
+            argu.insert("arg" + i, arg);
+            i++;
+        }
+
+        return null;
     }
 
 
@@ -541,7 +567,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
 
         // System.out.println("TypeSymbol " + type + " "+ name);
         if(name.equals("this")){
-            return new TypeSymbol("this");
+            return new TypeSymbol(argu.getThis().id);
         }
 
         if(type.type == PrimitiveType.IDENTIFIER){
@@ -549,7 +575,12 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
             if(symbol.type != PrimitiveType.IDENTIFIER){
                 type = new TypeSymbol(symbol.type);
             } else {
-                type = new TypeSymbol(((ClassDeclSymbol)symbol).id);
+                if(symbol instanceof ClassSymbol){
+                    type = new TypeSymbol(((ClassSymbol)symbol).className);
+                } else if(symbol instanceof ClassDeclSymbol){
+                    type = new TypeSymbol(((ClassDeclSymbol)symbol).id);
+                }
+
             }
         }
 
@@ -627,7 +658,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         // TODO Auto-generated method stub
         String name = n.f1.accept(this, argu).getTypeName();
         ClassDeclSymbol symbol = argu.lookupType(name);
-
+        argu.insertThis(symbol);
         argu.enter();
 
         n.f3.accept(this, argu);
@@ -693,6 +724,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         }
 
         ClassDeclSymbol symbol = argu.lookupType(className);
+
+        argu.insertThis(symbol);
         
         if(parent != null){
             parentEnterHelper(parent, argu);
@@ -808,7 +841,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         if(argu.insert(name, symbol) != null){
             throw new Exception("Duplicate use of name " + name);
         }
-        
+
 
         return null;
     }

@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class FunctionSymbol extends Symbol {
@@ -10,7 +11,7 @@ public class FunctionSymbol extends Symbol {
 
     public FunctionSymbol(String id, TypeSymbol returnType) {
         super(id, PrimitiveType.IDENTIFIER);
-        args = new HashMap<String, Symbol>();
+        args = new LinkedHashMap<String, Symbol>();
         this.returnType = returnType;
     }
 
@@ -23,7 +24,7 @@ public class FunctionSymbol extends Symbol {
 
     public FunctionSymbol(String id, String returnType) {
         super(id, PrimitiveType.IDENTIFIER);
-        args = new HashMap<String, Symbol>();
+        args = new LinkedHashMap<String, Symbol>();
         PrimitiveType type = PrimitiveType.strToPrimitiveType(returnType);
         if(type == PrimitiveType.IDENTIFIER){
             this.returnType = new TypeSymbol(returnType);
@@ -80,9 +81,9 @@ public class FunctionSymbol extends Symbol {
         return true;
     }
 
-    public boolean checkArgs(Map<String,Symbol> checkArgs) throws Exception {
+    public boolean checkArgs(Map<String,Symbol> checkArgs, SymbolTable table) throws Exception {
         Symbol[] argsArray = Arrays.copyOf(args.values().toArray(), args.size(), Symbol[].class);
-        Symbol[] checkArgsArray = Arrays.copyOf(checkArgs.values().toArray(), checkArgs.size(), Symbol[].class);
+        TypeSymbol[] checkArgsArray = Arrays.copyOf(checkArgs.values().toArray(), checkArgs.size(), TypeSymbol[].class);
 
         if(argsArray.length != checkArgsArray.length){
             throw new Exception("Declared method has a different number of args than the superclass");
@@ -93,7 +94,9 @@ public class FunctionSymbol extends Symbol {
                 throw new Exception("Declared method has a different type of args than the superclass");
             } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
                 ClassSymbol class1 = (ClassSymbol)argsArray[i];
-                ClassSymbol class2 = (ClassSymbol)checkArgsArray[i];
+                ClassDeclSymbol class2 = table.lookupType(checkArgsArray[i].getTypeName());
+
+
                 if(!class2.isInstanceOf(class1)){
                     throw new Exception("Declared method has a different type of args than the superclass");
                 }
