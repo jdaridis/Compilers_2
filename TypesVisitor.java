@@ -15,6 +15,9 @@ import syntaxtree.ClassExtendsDeclaration;
 import syntaxtree.Clause;
 import syntaxtree.CompareExpression;
 import syntaxtree.Expression;
+import syntaxtree.ExpressionList;
+import syntaxtree.ExpressionTail;
+import syntaxtree.ExpressionTerm;
 import syntaxtree.FalseLiteral;
 import syntaxtree.FormalParameter;
 import syntaxtree.Identifier;
@@ -402,10 +405,86 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         return new TypeSymbol(PrimitiveType.INT);
     }
 
+    /**
+     * Grammar production:
+     * f0 -> PrimaryExpression()
+     * f1 -> "."
+     * f2 -> Identifier()
+     * f3 -> "("
+     * f4 -> ( ExpressionList() )?
+     * f5 -> ")"
+     */
+
     @Override
     public TypeSymbol visit(MessageSend n, SymbolTable argu) throws Exception {
         // TODO Auto-generated method stub
+
+        TypeSymbol expression = n.f0.accept(this, argu);
+
+        if(expression.type != PrimitiveType.IDENTIFIER){
+            throw new Exception("Expected object type");
+        }
+
+        FunctionSymbol method;
+        String methodName = n.f2.accept(this, argu).getTypeName();
+
+        if(expression.getTypeName().equals("this")){
+            method = argu.lookupMethod(methodName);
+
+            if(method == null){
+                throw new Exception("Method " + methodName + " not defined");
+            }
+        } else {
+            ClassSymbol classSymbol = (ClassSymbol)argu.lookup(expression.getTypeName());
+            
+
+            method = (FunctionSymbol)classSymbol.methods.get(methodName);
+
+            if(method == null){
+                throw new Exception("Method " + methodName + " not defined");
+            }
+
+        }
+
+        
+
+        return method.returnType;
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> Expression()
+     * f1 -> ExpressionTail()
+     */
+
+    @Override
+    public TypeSymbol visit(ExpressionList n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
         return super.visit(n, argu);
+    }
+
+    /**
+     * Grammar production:
+     * f0 -> ( ExpressionTerm() )*
+     */
+
+    @Override
+    public TypeSymbol visit(ExpressionTail n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return super.visit(n, argu);
+    }
+
+
+    /**
+     * Grammar production:
+     * f0 -> ","
+     * f1 -> Expression()
+     */
+
+    @Override
+    public TypeSymbol visit(ExpressionTerm n, SymbolTable argu) throws Exception {
+        // TODO Auto-generated method stub
+        return n.f1.accept(this, argu);
     }
 
     /**

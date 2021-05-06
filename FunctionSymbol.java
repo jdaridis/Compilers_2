@@ -54,9 +54,31 @@ public class FunctionSymbol extends Symbol {
             }
         }
 
-        return checkArgs(override.args);
+        return checkArgsDecl(override.args);
     }
 
+
+    private boolean checkArgsDecl(Map<String,Symbol> checkArgs) throws Exception {
+        Symbol[] argsArray = Arrays.copyOf(args.values().toArray(), args.size(), Symbol[].class);
+        Symbol[] checkArgsArray = Arrays.copyOf(checkArgs.values().toArray(), checkArgs.size(), Symbol[].class);
+
+        if(argsArray.length != checkArgsArray.length){
+            throw new Exception("Declared method has a different number of args than the superclass");
+        }
+
+        for(int i=0;i<argsArray.length;i++){
+            if(argsArray[i].type != checkArgsArray[i].type){
+                throw new Exception("Declared method has a different type of args than the superclass");
+            } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
+                ClassSymbol class1 = (ClassSymbol)argsArray[i];
+                ClassSymbol class2 = (ClassSymbol)checkArgsArray[i];
+                if(!class1.className.equals(class2.className)){
+                    throw new Exception("Declared method has a different type of args than the superclass");
+                }
+            }
+        }
+        return true;
+    }
 
     public boolean checkArgs(Map<String,Symbol> checkArgs) throws Exception {
         Symbol[] argsArray = Arrays.copyOf(args.values().toArray(), args.size(), Symbol[].class);
@@ -70,7 +92,9 @@ public class FunctionSymbol extends Symbol {
             if(argsArray[i].type != checkArgsArray[i].type){
                 throw new Exception("Declared method has a different type of args than the superclass");
             } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
-                if(!((ClassSymbol)argsArray[i]).className.equals(((ClassSymbol)checkArgsArray[i]).className)){
+                ClassSymbol class1 = (ClassSymbol)argsArray[i];
+                ClassSymbol class2 = (ClassSymbol)checkArgsArray[i];
+                if(!class2.isInstanceOf(class1)){
                     throw new Exception("Declared method has a different type of args than the superclass");
                 }
             }

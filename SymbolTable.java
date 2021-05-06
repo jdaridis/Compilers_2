@@ -83,7 +83,7 @@ public class SymbolTable {
                 if(!(scope.get(name) instanceof FunctionSymbol)){
                     continue;
                 }
-                return scope.get(name);
+                return (FunctionSymbol)scope.get(name);
             }
         }
 
