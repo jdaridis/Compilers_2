@@ -92,7 +92,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
             symbol = new ClassSymbol(name, strType);
         }
         if(argu.insert(name, symbol) != null){
-            throw new Exception("Duplicate use of name " + name); 
+            throw new DuplicateDeclarationException(name);
+            // throw new Exception("Duplicate use of name " + name); 
         }
         
 
@@ -113,7 +114,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         String name = n.f0.accept(this, argu);
 
         if(argu.lookup(name) == null){
-            throw new Exception("Next time, do us the favor and declare the variable " + name);
+            throw new DeclarationException(name);
+            // throw new Exception("Next time, do us the favor and declare the variable " + name);
         }
 
         return super.visit(n, argu);
@@ -136,7 +138,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         String name = n.f0.accept(this, argu);
 
         if(argu.lookup(name) == null){
-            throw new Exception("Next time, do us the favor and declare the variable " + name);
+            throw new DeclarationException(name);
+            // throw new Exception("Next time, do us the favor and declare the variable " + name);
         }
         return super.visit(n, argu);
     }
@@ -160,7 +163,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         if(name != null){
             if(argu.lookup(name) == null){
-                throw new Exception("Next time, do us the favor and declare the variable " + name);
+                throw new DeclarationException(name);
+                // throw new Exception("Next time, do us the favor and declare the variable " + name);
             }
         }
         return null;
@@ -314,7 +318,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
 
         if(oldMethod != null) {
             if(oldMethod.type != PrimitiveType.IDENTIFIER){
-                throw new Exception("Duplicate use of name " + methodName);
+                throw new DuplicateDeclarationException(methodName);
+                // throw new Exception("Duplicate use of name " + methodName);
             }
             method.checkOverride((FunctionSymbol)oldMethod);
 
@@ -357,7 +362,8 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
             symbol = new ClassSymbol(name, strType);
         }
         if(argu.insert(name, symbol) != null){
-            throw new Exception("Duplicate use of name " + name);
+            throw new DuplicateDeclarationException(name);
+            // throw new Exception("Duplicate use of name " + name);
         }
         
 
