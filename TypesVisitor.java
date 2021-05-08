@@ -100,7 +100,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
             }
         }
         if(argu.insert(name, symbol) != null){
-            throw new Exception("Duplicate use of name " + name); 
+            throw new DuplicateDeclarationException(name);
+            // throw new Exception("Duplicate use of name " + name); 
         }
         
 
@@ -123,13 +124,15 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         Symbol symbol = argu.lookupField(name);
 
         if(symbol == null){
-            throw new Exception("Next time, do us the favor and declare the variable " + name);
+            throw new DeclarationException(name);
+            // throw new Exception("Next time, do us the favor and declare the variable " + name);
         }
 
         TypeSymbol exprType = n.f2.accept(this, argu);
 
         if(symbol.type != exprType.type){
-            throw new Exception("Wrong type assignment. Expected: " + symbol.type.typeName + " but got: " + exprType.getTypeName());
+            throw new TypeException(symbol.type.typeName, exprType.getTypeName());
+            // throw new Exception("Wrong type assignment. Expected: " + symbol.type.typeName + " but got: " + exprType.getTypeName());
         } else if(symbol.type == PrimitiveType.IDENTIFIER){
             ClassSymbol classSymbol = (ClassSymbol)symbol;
 
@@ -164,11 +167,13 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         Symbol symbol = argu.lookupField(name);
 
         if(symbol == null){
-            throw new Exception("Next time, do us the favor and declare the variable " + name);
+            throw new DeclarationException(name);
+            // throw new Exception("Next time, do us the favor and declare the variable " + name);
         }
 
         if(symbol.type != PrimitiveType.ARRAY){
-            throw new Exception("Type must be array. Was " + symbol.type.getTypeName());
+            throw new TypeException(PrimitiveType.ARRAY.typeName, symbol.type.getTypeName());
+            // throw new Exception("Type must be array. Was " + symbol.type.getTypeName());
         }
 
         TypeSymbol index = n.f2.accept(this, argu);
@@ -180,7 +185,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expr = n.f5.accept(this, argu);
 
         if(expr.type != PrimitiveType.INT){
-            throw new Exception("Type must be integer");
+            throw new TypeException(PrimitiveType.INT.typeName, expr.getTypeName());
+            // throw new Exception("Type must be integer");
         }
 
         return null;
@@ -204,7 +210,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expression = n.f2.accept(this, argu);
 
         if(expression.type != PrimitiveType.BOOLEAN){
-            throw new Exception("Only boolean expression allowed");
+            throw new TypeException(PrimitiveType.BOOLEAN.typeName, expression.getTypeName());
+            // throw new Exception("Only boolean expression allowed");
         }
 
         return null;
@@ -224,7 +231,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expression = n.f2.accept(this, argu);
 
         if(expression.type != PrimitiveType.BOOLEAN){
-            throw new Exception("Only boolean expression allowed");
+            throw new TypeException(PrimitiveType.BOOLEAN.typeName, expression.getTypeName());
+            // throw new Exception("Only boolean expression allowed");
         }
 
         return null;
@@ -244,7 +252,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expression = n.f2.accept(this, argu);
 
         if(expression.type != PrimitiveType.INT){
-            throw new Exception("Only int expression allowed");
+            throw new TypeException(PrimitiveType.INT.typeName, expression.getTypeName());
+            // throw new Exception("Only int expression allowed");
         }
 
         return null;
@@ -385,7 +394,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expr2 = n.f2.accept(this, argu);
 
         if(expr1.type != PrimitiveType.ARRAY){
-            throw new Exception("Type must be array");
+            throw new TypeException(PrimitiveType.ARRAY.typeName, expr1.getTypeName());
+            // throw new Exception("Type must be array");
         }
 
         if(expr2.type != PrimitiveType.INT){
@@ -408,7 +418,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expr1 = n.f0.accept(this, argu);
 
         if(expr1.type != PrimitiveType.ARRAY){
-            throw new Exception("Type must be array");
+            throw new TypeException(PrimitiveType.ARRAY.typeName, expr1.getTypeName());
+            // throw new Exception("Type must be array");
         }
 
         return new TypeSymbol(PrimitiveType.INT);
@@ -431,7 +442,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expression = n.f0.accept(this, argu);
 
         if(expression.type != PrimitiveType.IDENTIFIER){
-            throw new Exception("Expected object type");
+            throw new TypeException("object type or this", expression.getTypeName());
+            // throw new Exception("Expected object type");
         }
 
         FunctionSymbol method;
@@ -537,7 +549,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
         TypeSymbol expr1 = n.f1.accept(this, argu);
 
         if(expr1.type != PrimitiveType.BOOLEAN){
-            throw new Exception("Type must be boolean");
+            throw new TypeException(PrimitiveType.BOOLEAN.typeName, expr1.getTypeName());
+            // throw new Exception("Type must be boolean");
         }
 
         return new TypeSymbol(PrimitiveType.BOOLEAN);
@@ -839,7 +852,8 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
             }
         }
         if(argu.insert(name, symbol) != null){
-            throw new Exception("Duplicate use of name " + name);
+            throw new DuplicateDeclarationException(name);
+            // throw new Exception("Duplicate use of name " + name);
         }
 
 
