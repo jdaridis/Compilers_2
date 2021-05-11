@@ -187,7 +187,10 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         ClassDeclSymbol symbol = new ClassDeclSymbol(name);
         Map<String, Symbol> fields;
         Map<String, Symbol> methods;
-        argu.insert(name, symbol);
+        if(argu.insert(name, symbol) != null){
+            throw new DuplicateDeclarationException(name);
+        }
+        argu.insertThis(symbol);
 
         argu.enter();
 
@@ -253,7 +256,11 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         }
 
         ClassDeclSymbol symbol = new ClassDeclSymbol(className, parent);
-        argu.insert(className, symbol);
+        if(argu.insert(className, symbol) != null){
+            throw new DuplicateDeclarationException(className);
+        }
+
+        argu.insertThis(symbol);
         
         if(parent != null){
             parentEnterHelper(parent, argu, symbol.methods);
@@ -316,12 +323,15 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         args = argu.peek();
         method.args.putAll(args);
 
+        
+
         if(oldMethod != null) {
-            if(oldMethod.type != PrimitiveType.IDENTIFIER){
+            if(argu.getThis().parentClass != null && (argu.getThis().parentClass.methods.containsKey(methodName))){
+                method.checkOverride((FunctionSymbol)oldMethod);
+            } else {
                 throw new DuplicateDeclarationException(methodName);
                 // throw new Exception("Duplicate use of name " + methodName);
             }
-            method.checkOverride((FunctionSymbol)oldMethod);
 
         }
 

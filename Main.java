@@ -25,7 +25,7 @@ public class Main {
                 SymbolTable symbolTable = new SymbolTable();
 
                 root.accept(declarations, symbolTable);
-                symbolTable.print();
+                // symbolTable.print();
 
                 TypesVisitor typeCheck = new TypesVisitor();
 
@@ -43,7 +43,13 @@ public class Main {
                     }
 
                     for(Symbol method: classSym.methods.values()){
-                        System.out.println(classSym.id + "." + method.id + ":" + methodOffset);
+                        if(classSym.parentClass != null){
+                            if(!classSym.parentClass.methods.containsKey(method.id)){
+                                System.out.println(classSym.id + "." + method.id + ":" + methodOffset);
+                            }
+                        } else {
+                            System.out.println(classSym.id + "." + method.id + ":" + methodOffset);
+                        }
                         methodOffset += method.type.getSize();
                     }
                 }

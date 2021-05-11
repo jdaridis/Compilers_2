@@ -24,7 +24,6 @@ public class ClassDeclSymbol extends Symbol {
     }
 
     private boolean isInstanceOfHelper(ClassDeclSymbol parent, ClassDeclSymbol child) {
-        System.out.println("Parent: " + parent + ", Child: " + child);
         if (child == null) {
             return false;
         } else if (parent.id.equals(child.id)) {

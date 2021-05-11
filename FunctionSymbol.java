@@ -86,19 +86,21 @@ public class FunctionSymbol extends Symbol {
         TypeSymbol[] checkArgsArray = Arrays.copyOf(checkArgs.values().toArray(), checkArgs.size(), TypeSymbol[].class);
 
         if(argsArray.length != checkArgsArray.length){
-            throw new Exception("Declared method has a different number of args than the superclass");
+            throw new Exception("Method call " + this.id + " has a different number of args than declared. Expected: " + argsArray.length + " but found: " + checkArgsArray.length);
         }
 
         for(int i=0;i<argsArray.length;i++){
             if(argsArray[i].type != checkArgsArray[i].type){
-                throw new Exception("Declared method has a different type of args than the superclass");
+                throw new TypeException(argsArray[i].type.typeName, checkArgsArray[i].type.typeName);
+                // throw new Exception("Declared method has a different type of args than the superclass");
             } else if(argsArray[i].type == PrimitiveType.IDENTIFIER){
                 ClassSymbol class1 = (ClassSymbol)argsArray[i];
                 ClassDeclSymbol class2 = table.lookupType(checkArgsArray[i].getTypeName());
 
 
                 if(!class2.isInstanceOf(class1)){
-                    throw new Exception("Declared method has a different type of args than the superclass");
+                    throw new Exception("Type " + class2.id + " not instance of " + class1.className);
+                    // throw new Exception("Declared method has a different type of args than the superclass");
                 }
             }
         }
