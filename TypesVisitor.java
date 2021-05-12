@@ -66,7 +66,12 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
 
     @Override
     public TypeSymbol visit(MainClass n, SymbolTable argu) throws Exception {
+        String arg = n.f11.accept(this, argu).getTypeName();
+
+        Symbol symbol = new ClassSymbol(arg, "String[]");
         argu.enter();
+
+        argu.insert(arg, symbol);
         super.visit(n, argu);
 
         argu.exit();
@@ -139,7 +144,7 @@ public class TypesVisitor extends GJDepthFirst<TypeSymbol,SymbolTable>  {
             ClassDeclSymbol exprClass = argu.lookupType(exprType.getTypeName());
 
 
-            if(!exprClass.isInstanceOf(classSymbol)){
+            if(exprClass != null && !exprClass.isInstanceOf(classSymbol)){
                 throw new Exception("Type " + exprClass.id + " not instance of " + classSymbol.className);
             }
         }

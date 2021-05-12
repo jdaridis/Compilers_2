@@ -60,8 +60,12 @@ public class DeclarationsVisitor extends GJDepthFirst<String, SymbolTable> {
         // TODO Auto-generated method stub
         String name = n.f1.accept(this, argu);
         argu.insert(name, new ClassDeclSymbol(name));
+        String arg = n.f11.accept(this, argu);
 
+        Symbol symbol = new ClassSymbol(arg, "String[]");
         argu.enter();
+
+        argu.insert(arg, symbol);
         super.visit(n, argu);
 
         argu.exit();
