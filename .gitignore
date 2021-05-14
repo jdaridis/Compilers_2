@@ -1,6 +1,7 @@
 *.jar
 *.class
 *.jj
+*.zip
 /syntaxtree
 /visitor
 /tests
@@ -12,3 +13,4 @@ Token.java
 TokenMgrError.java
 Test_1.java
 test.sh
+README.odt

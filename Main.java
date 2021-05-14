@@ -30,18 +30,17 @@ public class Main {
                 TypesVisitor typeCheck = new TypesVisitor();
 
                 root.accept(typeCheck, symbolTable);
-
-
+                
                 for(Symbol s: symbolTable.peek().values()){
                     ClassDeclSymbol classSym = (ClassDeclSymbol)s;
                     int fieldOffset = computeClassSize(classSym.parentClass, symbolTable);
                     int methodOffset = 0;
-
+                    
                     for(Symbol field: classSym.fields.values()){
                         System.out.println(classSym.id + "." + field.id + ":" + fieldOffset);
                         fieldOffset += field.type.getSize();
                     }
-
+                    
                     for(Symbol method: classSym.methods.values()){
                         if(classSym.parentClass != null){
                             if(!classSym.parentClass.methods.containsKey(method.id)){
@@ -53,6 +52,9 @@ public class Main {
                         methodOffset += method.type.getSize();
                     }
                 }
+
+                symbolTable.exit();
+                
             }
             catch(ParseException ex){
                 System.out.println(ex.getMessage());
